@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ACONEWS</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="brand-logo">
+        <a href="#">ACONEWS</a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="#news">News</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="burger" id="burger">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+      </div>
+    </nav>
+    <!-- navbar -->
+    <!-- Home Section -->
+    <section class="home">
+      <div class="overlay">
+        <div class="home-content">
+          <h1 class="title animate-title">ACONEWS: Your Daily News Hub</h1>
+          <p class="subtitle animate-subtitle">
+            Bringing you the freshest global news, tailored to your interests.
+            Stay informed, stay ahead.
+          </p>
+          <a href="#news" class="cta-button animate-button"
+            >Discover Latest News</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- home section -->
+
+    <!-- news  -->
+    <section id="news" class="news-section">
+      <div class="news-container">
+        <!-- News articles will be dynamically inserted here -->
+      </div>
+    </section>
+
+    <!-- news -->
+    <!-- about -->
+    <section id="about" class="about-section">
+      <div class="about-content">
+        <h2 class="about-title">About ACONEWS</h2>
+        <p class="about-description">
+          Welcome to ACONEWS, your ultimate destination for staying updated with
+          the latest global news. Our app provides you with a user-friendly
+          interface to browse news articles from various sources, tailored to
+          your interests. With real-time updates and a sleek design, ACONEWS
+          keeps you informed on the go.
+        </p>
+        <a href="#contact" class="about-cta">Get in Touch</a>
+      </div>
+      <div class="about-image">
+        <img src="about-section.jpg" alt="About ACONEWS" />
+      </div>
+    </section>
+
+    <!-- about -->
+    <!-- contact section -->
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+      <div class="contact-container">
+        <h2>Contact Us</h2>
+        <form id="contactForm" class="contact-form">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="submit-button">Send Message</button>
+          <p class="form-status"></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- contact section -->
+    <!-- footer -->
+    <!-- Footer Section -->
+    <footer id="footer">
+      <div class="footer-content">
+        <p>&copy; 2024 Acowale. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://facebook.com" target="_blank" aria-label="Facebook">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="https://linkedin.com" target="_blank" aria-label="LinkedIn">
+            <i class="fab fa-linkedin-in"></i>
+          </a>
+          <a href="https://github.com" target="_blank" aria-label="GitHub">
+            <i class="fab fa-github"></i
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- footer -->
+    <script src="script.js"></script>
+    <!-- script for firebase -->
+    <script type="module">
+      // Import Firebase SDKs
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-analytics.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        serverTimestamp,
+      } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js";
+    
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDyg8bEhdOGHJ2hUjmo6GR2Fd_NSIKNArg",
+        authDomain: "newsapp-project-c86a7.firebaseapp.com",
+        projectId: "newsapp-project-c86a7",
+        storageBucket: "newsapp-project-c86a7.appspot.com",
+        messagingSenderId: "525662687923",
+        appId: "1:525662687923:web:5fdad6c730a85b0afc16c6",
+        measurementId: "G-DXEX52X5QS",
+      };
+    
+      // Initialize Firebase and Firestore
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db = getFirestore(app);
+    
+      document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("contactForm");
+        const statusMessage = document.querySelector(".form-status");
+    
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault(); // Prevent default form submission
+    
+          // Get form data
+          const formData = new FormData(form);
+          const name = formData.get("name");
+          const email = formData.get("email");
+          const message = formData.get("message");
+    
+          try {
+            // Send data to Firebase
+            await addDoc(collection(db, "contactMessages"), {
+              name: name,
+              email: email,
+              message: message,
+              timestamp: serverTimestamp(),
+            });
+    
+            statusMessage.textContent = "Message sent successfully!";
+            statusMessage.style.color = "green";
+            form.reset();
+          } catch (error) {
+            console.error("Error occurred:", error.code, error.message);
+            statusMessage.textContent = "Error sending message. Please try again.";
+            statusMessage.style.color = "red";
+          }
+        });
+      });
+    </script>
+    
+    
+    <!-- script for firebase -->
+  </body>
+</html>
